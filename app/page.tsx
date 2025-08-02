@@ -47,7 +47,7 @@ export default function PamelaApp() {
   const handleStartChat = () => {
     if (roomCode && selectedLanguage) {
       // Initialize socket connection
-      socketRef.current = io('http://localhost:3001')
+      socketRef.current = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`)
       
       socketRef.current.on('connect', () => {
         console.log('Connected to server')
