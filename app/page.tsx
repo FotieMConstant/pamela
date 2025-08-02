@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
-import { Send, Mic, ArrowLeft, HeartHandshake } from "lucide-react"
+import { Send, Mic, ArrowLeft, HeartHandshake, Heart } from "lucide-react"
 import { io, Socket } from 'socket.io-client'
 
 interface Message {
@@ -18,8 +18,8 @@ interface Message {
 
 export default function PamelaApp() {
   const [currentPage, setCurrentPage] = useState<"welcome" | "chat">("welcome")
-  const [roomCode, setRoomCode] = useState("sun_pamelavieira")
-  const [selectedLanguage, setSelectedLanguage] = useState("")
+  const [roomCode, setRoomCode] = useState("")
+  const [selectedLanguage, setSelectedLanguage] = useState("pt") // Default to Portuguese
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState("")
   const [isConnected, setIsConnected] = useState(false)
@@ -45,7 +45,7 @@ export default function PamelaApp() {
   }, [])
 
   const handleStartChat = () => {
-    if (roomCode && selectedLanguage) {
+    if (roomCode === "sun_pamelavieira" && selectedLanguage) {
       // Initialize socket connection
       socketRef.current = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`)
       
@@ -119,6 +119,7 @@ export default function PamelaApp() {
 
   if (currentPage === "welcome") {
     return (
+      <>
       <div className="min-h-screen bg-gradient-to-br from-sky-50 via-rose-50 to-indigo-50 flex items-center justify-center p-4">
         <Card className="w-full max-w-md mx-auto shadow-xl border-0 bg-white/80 backdrop-blur-sm">
           <CardContent className="p-8 space-y-6">
@@ -130,18 +131,26 @@ export default function PamelaApp() {
                 </div>
               </div>
               <h1 className="text-2xl font-bold text-slate-800 leading-relaxed">
-                { selectedLanguage === "en" ? "I want to know you past the language barrier." : "Eu quero te conhecer além da barreira do idioma." }
+                { selectedLanguage === "en" ? "I’m just someone curious to know who you are." : "Sou apenas alguém curioso para saber quem você é." }
                 {/* This line is for Portuguese, you can remove it if not needed */}
               </h1>
-              <p className="text-slate-600 text-lg">Choose your language and start chatting.</p>
+              <p className="text-slate-600 text-lg">
+                { selectedLanguage === "en" ? "Language won’t stand in our way." : "A língua não será um obstáculo para nós." }
+              </p>
             </div>
 
             {/* Form */}
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Chat Room Code</label>
+                <label className="text-sm font-medium text-slate-700">
+                  { selectedLanguage === "en" ? "Secret Code" : "Código Secreto" }
+                </label>
                 <Input
-                  placeholder="Enter room code..."
+                  placeholder={`${
+                    selectedLanguage === "en"
+                      ? "Enter code here (get it from Cody)..."
+                      : "Digite o código aqui (obtenha com Cody)..."
+                  }`}
                   value={roomCode}
                   onChange={(e) => setRoomCode(e.target.value)}
                   className="h-12 text-lg border-slate-200 focus:border-rose-300 focus:ring-rose-200"
@@ -149,10 +158,12 @@ export default function PamelaApp() {
               </div>
 
               <div className="space-y-3 w-full">
-                <div className="text-sm font-medium text-slate-700">Your Language</div>
+                <div className="text-sm font-medium text-slate-700">
+                  { selectedLanguage === "en" ? "Select your language" : "Selecione seu idioma" }
+                </div>
                 <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
                   <SelectTrigger className="h-12 w-full text-lg border-slate-200 focus:border-rose-300 focus:ring-rose-200">
-                    <SelectValue placeholder="Select your language" />
+                    <SelectValue placeholder={selectedLanguage === "en" ? "Select your language" : "Selecione seu idioma"}   />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="en">English</SelectItem>
@@ -163,15 +174,30 @@ export default function PamelaApp() {
 
               <Button
                 onClick={handleStartChat}
-                disabled={!roomCode || !selectedLanguage}
+                disabled={!roomCode || !selectedLanguage || roomCode !== "sun_pamelavieira"}
                 className="w-full h-12 text-lg bg-rose-500 hover:bg-rose-600 text-white rounded-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
               >
-                Start Chat
+                { selectedLanguage === "en" ? "Start Chat" : "Iniciar Conversa" }
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </Card> 
       </div>
+      <div>
+         {/* add a small footer here that says "Built with the heart" */}
+        <div className="text-center text-sm text-slate-500 py-4 fixed bottom-0 w-full">
+          <div className="flex justify-center items-center space-x-1">
+            <div>
+            { selectedLanguage === "en" ? "Built with the" : "Construído com o" }
+            </div>
+            <Heart className="inline-block w-4 h-4 text-rose-500 ml-1" />
+             <div>
+            { selectedLanguage === "en" ? "by Cody" : "por Cody" }
+            </div>
+          </div>
+        </div>
+      </div>
+      </>
     )
   }
 
